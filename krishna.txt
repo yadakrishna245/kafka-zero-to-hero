@@ -1,0 +1,121 @@
+#Kafka Setup:
+
+#Prerequisites:
+
+#Docker and docker compose to be install on machine :
+
+sudo apt update
+sudo apt install -y ca-certificates curl gnupg
+sudo install -m 0755 -d /etc/apt/keyrings
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
+sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
+sudo chmod a+r /etc/apt/keyrings/docker.gpg
+echo \
+"deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] \
+https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+sudo apt update
+sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+docker --version
+
+
+#Python 3.11 or later:
+
+sudo apt update
+sudo apt install python3.11 python3.11-venv
+python3.11 --version
+
+#create a virtual environment:
+
+python3.11 -m venv .venv
+
+
+#Activate the environment:
+
+source .venv/bin/activate
+
+pip install --upgrade pip
+pip install -e .
+
+
+#start Kafka:
+
+./scripts/start-kafka.sh
+
+in browser : http://localhost:8080
+
+#Stop kafks:
+
+./scripts/stop-kafka.sh
+
+#Live Terminal Demo (Recommended For Presentations)
+#This flow matches how you would explain Kafka in real time:
+
+Start Kafka.
+Start producer and show events being written.
+Start consumer and show near real-time reads.
+
+
+#Terminal 1: Start Kafka
+
+./scripts/start-kafka.sh
+
+Optional browser view:
+
+Kafka UI: http://localhost:8080
+
+#Terminal 2: Create topic once
+
+source .venv/bin/activate
+
+python examples/live_topic_setup.py --topic order-events-live
+
+
+#Terminal 3: Start producer
+
+source .venv/bin/activate
+
+python examples/live_producer.py --topic order-events-live --interval 1
+You will see PRODUCED_EVENT ... logs continuously.
+
+#Terminal 4: Start consumer
+
+source .venv/bin/activate
+
+python examples/live_consumer.py --topic order-events-live
+You will see CONSUMED_EVENT ... logs almost immediately after each produced event.
+
+#Useful options:
+
+Read old events too: python examples/live_consumer.py --topic order-events-live --from-beginning
+Produce a fixed number of events: python examples/live_producer.py --topic order-events-live --max-events 20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
